@@ -6,7 +6,11 @@ const bcrypt = require('bcryptjs');
 const { WEEK_DAYS } = require('./constants');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+// Vercel's function filesystem is read-only (only /tmp is writable), so the
+// local data directory must only be created when running outside Vercel.
+if (!process.env.VERCEL && !fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
 
 // Vercel's filesystem is read-only except the ephemeral /tmp directory.
 // The database re-seeds automatically on every cold start (demo-friendly).

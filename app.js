@@ -47,6 +47,11 @@ app.use(cookieSession({
 
 app.use(injectLocals);
 
+// Lightweight liveness probe (no view/database work beyond module initialisation)
+app.get('/healthz', (req, res) => {
+  res.json({ ok: true, service: 'medicare-hms', time: new Date().toISOString() });
+});
+
 // Real-time slot availability (used by booking forms in both portals)
 app.get('/availability', requireAuth, (req, res) => {
   const { db } = require('./src/db');
