@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/index.js": {
-      "includeFiles": ["views/**", "public/**", "src/**"],
+      "includeFiles": "{views,public,src}/**",
       "maxDuration": 30
     }
   },
