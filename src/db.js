@@ -8,7 +8,13 @@ const { WEEK_DAYS } = require('./constants');
 const DATA_DIR = path.join(__dirname, '..', 'data');
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
-const db = new DatabaseSync(path.join(DATA_DIR, 'hospital.db'));
+// Vercel's filesystem is read-only except the ephemeral /tmp directory.
+// The database re-seeds automatically on every cold start (demo-friendly).
+const DB_PATH = process.env.VERCEL
+  ? '/tmp/hospital.db'
+  : path.join(DATA_DIR, 'hospital.db');
+
+const db = new DatabaseSync(DB_PATH);
 db.exec('PRAGMA foreign_keys = ON');
 db.exec('PRAGMA journal_mode = WAL');
 

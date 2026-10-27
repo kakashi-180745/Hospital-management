@@ -7,6 +7,9 @@
     "start": "node --experimental-sqlite server.js",
     "dev": "node --experimental-sqlite --watch server.js"
   },
+  "engines": {
+    "node": "22.x"
+  },
   "keywords": [
     "hospital",
     "management",
@@ -18,9 +21,9 @@
   "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "cookie-session": "^2.1.0",
     "ejs": "^3.1.10",
     "express": "^4.21.2",
-    "express-session": "^1.18.1",
     "method-override": "^3.0.0"
   }
 }

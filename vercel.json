@@ -1,0 +1,12 @@
+{
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "{views,public,src}/**",
+      "memory": 512,
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/index" }
+  ]
+}
