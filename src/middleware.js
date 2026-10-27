@@ -34,8 +34,13 @@ function injectLocals(req, res, next) {
   if (req.session && req.session.user) {
     const { role, id } = req.session.user;
     const table = role === 'admin' ? 'admins' : 'users';
-    res.locals.currentUser = db.prepare(`SELECT * FROM ${table} WHERE id = ?`).get(id);
-    if (res.locals.currentUser) res.locals.currentUser.role = role;
+    const record = db.prepare(`SELECT * FROM ${table} WHERE id = ?`).get(id);
+    if (!record) {
+      // Account no longer exists (e.g. patient was deleted): end the session.
+      return req.session.destroy(() => res.redirect('/login'));
+    }
+    record.role = role;
+    res.locals.currentUser = record;
   }
 
   const flash = req.session.flash || {};
