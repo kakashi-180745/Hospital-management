@@ -1,0 +1,82 @@
+<%- include('../partials/header', { title, active }) %>
+
+<div class="page-head">
+  <div>
+    <h1>Prescriptions</h1>
+    <p>All prescriptions issued across the hospital and pending completion alerts.</p>
+  </div>
+</div>
+
+<% if (pendingRx.length) { %>
+  <div class="card mt-0" style="border-left:4px solid var(--warning);margin-bottom:22px">
+    <div class="card-header">
+      <div>
+        <h2>Awaiting prescription (<%= pendingRx.length %>)</h2>
+        <p>Completed visits that still need a prescription recorded.</p>
+      </div>
+    </div>
+    <div class="card-body flush">
+      <div class="table-responsive">
+        <table class="table">
+          <thead><tr><th>Appointment</th><th>Patient</th><th>Doctor</th><th>Date</th><th></th></tr></thead>
+          <tbody>
+            <% pendingRx.forEach(function(a){ %>
+              <tr>
+                <td class="muted">#<%= a.id %></td>
+                <td class="strong"><%= a.patient_name %></td>
+                <td class="muted"><%= a.doctor_name %></td>
+                <td class="nowrap"><%= formatDate(a.appointment_date) %> · <%= timeLabel(a.time_slot) %></td>
+                <td><a class="btn btn-primary btn-sm" href="/admin/appointments/<%= a.id %>">Add prescription</a></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<div class="card">
+  <div class="card-body flush">
+    <% if (prescriptions.length === 0) { %>
+      <div class="empty-state">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 20.5 3.5 13.5a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+        </div>
+        <h3>No prescriptions issued yet</h3>
+        <p>Complete an appointment and attach a prescription to see it here.</p>
+      </div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="table">
+          <thead><tr><th>Issued</th><th>Patient</th><th>Doctor</th><th>Visit</th><th>Diagnosis</th><th>Medicines</th><th></th></tr></thead>
+          <tbody>
+            <% prescriptions.forEach(function(rx){ %>
+              <tr>
+                <td class="nowrap muted"><%= formatDate(rx.created_at.slice(0,10)) %></td>
+                <td class="strong"><%= rx.patient_name %></td>
+                <td class="muted"><%= rx.doctor_name || '—' %></td>
+                <td class="nowrap muted">#<%= rx.appointment_id %><br><%= formatDate(rx.appointment_date) %> <%= timeLabel(rx.time_slot) %></td>
+                <td style="min-width:160px"><%= rx.diagnosis %></td>
+                <td style="min-width:220px" class="preserve-lines muted"><%= rx.medicines %></td>
+                <td>
+                  <div class="row-actions">
+                    <a class="btn btn-outline btn-sm" href="/admin/appointments/<%= rx.appointment_id %>">View visit</a>
+                    <form action="/admin/prescriptions/<%= rx.id %>?_method=DELETE" method="POST" class="inline-form"
+                          data-confirm="Delete this prescription?">
+                      <button class="btn btn-danger btn-sm" type="submit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

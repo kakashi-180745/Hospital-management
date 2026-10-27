@@ -1,0 +1,87 @@
+<%- include('../partials/header', { title, active }) %>
+
+<div class="page-head">
+  <div>
+    <h1>Patients</h1>
+    <p>Search and manage every registered patient and their records.</p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="filter-bar">
+    <form method="GET" action="/admin/patients" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;flex:1">
+      <div class="form-group" style="flex:1;min-width:220px">
+        <label>Search by name, email or phone</label>
+        <input class="form-control" type="search" name="q" value="<%= q %>" placeholder="Type to search...">
+      </div>
+      <button class="btn btn-primary" type="submit">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Search
+      </button>
+      <% if (q) { %><a class="btn btn-outline" href="/admin/patients">Clear</a><% } %>
+    </form>
+  </div>
+
+  <div class="card-body flush">
+    <% if (patients.length === 0) { %>
+      <div class="empty-state">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <h3><%= q ? 'No patients match your search' : 'No patients registered yet' %></h3>
+        <p><%= q ? 'Try a different name, email or phone number.' : 'New patient registrations will appear here.' %></p>
+      </div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr><th>Patient</th><th>Contact</th><th>Gender / Blood</th><th>Appointments</th><th>Outstanding dues</th><th>Joined</th><th class="nowrap">Actions</th></tr>
+          </thead>
+          <tbody>
+            <% patients.forEach(function(p){ %>
+              <tr>
+                <td>
+                  <div style="display:flex;align-items:center;gap:11px">
+                    <div class="avatar"><%= p.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase() %></div>
+                    <div class="cell-name">
+                      <span class="strong"><%= p.name %></span>
+                      <small>ID #<%= p.id %></small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="cell-name">
+                    <span><%= p.email %></span>
+                    <small><%= p.phone || 'no phone' %></small>
+                  </div>
+                </td>
+                <td class="muted nowrap"><%= p.gender || '—' %> · <%= p.blood_group || '—' %></td>
+                <td><span class="badge badge-info"><%= p.appt_count %> visit(s)</span></td>
+                <td class="<%= p.due_amount > 0 ? 'text-danger fw-bold' : 'text-muted' %> nowrap">
+                  <%= p.due_amount > 0 ? inr(p.due_amount) : 'Clear' %>
+                </td>
+                <td class="muted nowrap"><%= formatDate(p.created_at.slice(0,10)) %></td>
+                <td>
+                  <div class="row-actions">
+                    <a class="btn btn-outline btn-sm" href="/admin/patients/<%= p.id %>">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                      View
+                    </a>
+                    <form action="/admin/patients/<%= p.id %>?_method=DELETE" method="POST" class="inline-form"
+                          data-confirm="Delete patient '<%= p.name %>' and ALL their appointments, prescriptions and bills?">
+                      <button class="btn btn-danger btn-sm" type="submit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

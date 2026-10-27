@@ -1,0 +1,112 @@
+<%- include('../partials/header', { title, active }) %>
+
+<div class="page-head">
+  <div>
+    <h1>Doctors</h1>
+    <p>Manage the medical panel, specializations, fees and weekly availability.</p>
+  </div>
+  <div class="page-actions">
+    <button class="btn btn-primary" data-modal-open="addDoctorModal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add doctor
+    </button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body flush">
+    <% if (doctors.length === 0) { %>
+      <div class="empty-state">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg>
+        </div>
+        <h3>No doctors yet</h3>
+        <p>Add a doctor to make them available for patient bookings.</p>
+      </div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr><th>Doctor</th><th>Department</th><th>Specialization</th><th>Experience</th><th>Fee</th><th>Available</th><th>Status</th><th class="nowrap">Actions</th></tr>
+          </thead>
+          <tbody>
+            <% doctors.forEach(function(doc){ %>
+              <tr>
+                <td>
+                  <div class="cell-name">
+                    <span class="strong"><%= doc.name %></span>
+                    <small><%= doc.email || '—' %> · <%= doc.phone || 'no phone' %></small>
+                  </div>
+                </td>
+                <td class="muted"><%= doc.department_name || 'Unassigned' %></td>
+                <td class="muted"><%= doc.specialization || '—' %></td>
+                <td class="nowrap"><%= doc.experience_years %> yrs</td>
+                <td class="nowrap fw-bold"><%= inr(doc.fee) %></td>
+                <td class="fs-sm muted nowrap"><%= doc.available_days.replace(/,/g, ', ') %><br><%= timeLabel(doc.available_from) %> – <%= timeLabel(doc.available_to) %></td>
+                <td><span class="badge <%= statusBadge(doc.status) %>"><%= doc.status %></span></td>
+                <td>
+                  <div class="row-actions">
+                    <a class="btn btn-outline btn-sm" href="/admin/doctors?edit=<%= doc.id %>">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
+                      Edit
+                    </a>
+                    <form action="/admin/doctors/<%= doc.id %>?_method=DELETE" method="POST" class="inline-form"
+                          data-confirm="Delete doctor '<%= doc.name %>'? This cannot be undone.">
+                      <button class="btn btn-danger btn-sm" type="submit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<!-- Add doctor modal -->
+<div class="modal" id="addDoctorModal">
+  <div class="modal-backdrop" data-modal-close></div>
+  <div class="modal-card modal-lg">
+    <form action="/admin/doctors" method="POST">
+      <div class="modal-head">
+        <h3>Add new doctor</h3>
+        <button type="button" class="modal-close" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body">
+        <%- include('doctor-form', { doc: null, departments, weekDays, doctorStatuses }) %>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary">Add doctor</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit doctor modal -->
+<% if (edit) { %>
+<div class="modal open" id="editDoctorModal">
+  <div class="modal-backdrop" data-modal-close></div>
+  <div class="modal-card modal-lg">
+    <form action="/admin/doctors/<%= edit.id %>?_method=PUT" method="POST">
+      <div class="modal-head">
+        <h3>Edit doctor — <%= edit.name %></h3>
+        <a class="modal-close" href="/admin/doctors">&times;</a>
+      </div>
+      <div class="modal-body">
+        <%- include('doctor-form', { doc: edit, departments, weekDays, doctorStatuses }) %>
+      </div>
+      <div class="modal-foot">
+        <a class="btn btn-outline" href="/admin/doctors">Cancel</a>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+<% } %>
+
+<%- include('../partials/footer') %>

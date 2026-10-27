@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Registration · MediCare HMS</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230d9488'%3E%3Cpath d='M19 8h-2V3H7v5H5c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-9c0-1.1-.9-2-2-2zm-6 9h-2v-3H8v-2h3V9h2v3h3v2h-3v3z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="auth-wrapper">
+  <%- include('../partials/auth-aside') %>
+
+  <main class="auth-main">
+    <div class="auth-card" style="max-width:520px">
+      <div class="auth-logo-row">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" fill="#fff"><path d="M19 8h-2V3H7v5H5c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-9c0-1.1-.9-2-2-2zm-6 9h-2v-3H8v-2h3V9h2v3h3v2h-3v3z"/></svg>
+        </div>
+        <div class="brand-name" style="color:var(--ink)">MediCare HMS</div>
+      </div>
+
+      <h1>Create patient account</h1>
+      <p class="subtitle">Register to book appointments, view prescriptions and pay bills online.</p>
+
+      <%- include('../partials/flash') %>
+
+      <form action="/register" method="POST" novalidate>
+        <div class="form-grid">
+          <div class="form-group span-2">
+            <label for="name">Full name <span class="req">*</span></label>
+            <input class="form-control <%= errors.name?'is-invalid':'' %>" type="text" id="name" name="name"
+                   value="<%= form.name || '' %>" placeholder="e.g. Anjali Verma" required>
+            <% if (errors.name) { %><span class="field-error"><%= errors.name %></span><% } %>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email <span class="req">*</span></label>
+            <input class="form-control <%= errors.email?'is-invalid':'' %>" type="email" id="email" name="email"
+                   value="<%= form.email || '' %>" placeholder="you@example.com" required>
+            <% if (errors.email) { %><span class="field-error"><%= errors.email %></span><% } %>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone</label>
+            <input class="form-control <%= errors.phone?'is-invalid':'' %>" type="tel" id="phone" name="phone"
+                   value="<%= form.phone || '' %>" placeholder="10-digit mobile number" maxlength="10">
+            <% if (errors.phone) { %><span class="field-error"><%= errors.phone %></span><% } %>
+          </div>
+
+          <div class="form-group">
+            <label for="gender">Gender</label>
+            <select class="form-control" id="gender" name="gender">
+              <option value="">Prefer not to say</option>
+              <% genders.forEach(function(g){ %>
+                <option value="<%= g %>" <%= form.gender===g?'selected':'' %>><%= g %></option>
+              <% }) %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="dob">Date of birth</label>
+            <input class="form-control <%= errors.dob?'is-invalid':'' %>" type="date" id="dob" name="dob"
+                   value="<%= form.dob || '' %>" max="<%= new Date().toISOString().slice(0,10) %>">
+            <% if (errors.dob) { %><span class="field-error"><%= errors.dob %></span><% } %>
+          </div>
+
+          <div class="form-group">
+            <label for="blood_group">Blood group</label>
+            <select class="form-control" id="blood_group" name="blood_group">
+              <option value="">Not sure</option>
+              <% bloodGroups.forEach(function(bg){ %>
+                <option value="<%= bg %>" <%= form.blood_group===bg?'selected':'' %>><%= bg %></option>
+              <% }) %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password <span class="req">*</span></label>
+            <input class="form-control <%= errors.password?'is-invalid':'' %>" type="password" id="password"
+                   name="password" placeholder="Min. 6 characters" required>
+            <% if (errors.password) { %><span class="field-error"><%= errors.password %></span><% } %>
+          </div>
+
+          <div class="form-group span-2">
+            <label for="confirm_password">Confirm password <span class="req">*</span></label>
+            <input class="form-control <%= errors.confirm_password?'is-invalid':'' %>" type="password"
+                   id="confirm_password" name="confirm_password" placeholder="Re-enter password" required>
+            <% if (errors.confirm_password) { %><span class="field-error"><%= errors.confirm_password %></span><% } %>
+          </div>
+
+          <div class="form-group span-2">
+            <label for="address">Residential address</label>
+            <textarea class="form-control" id="address" name="address"
+                      placeholder="House no, street, city, pincode"><%= form.address || '' %></textarea>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block mt-3" type="submit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          Register &amp; continue
+        </button>
+      </form>
+
+      <p class="auth-alt">Already registered? <a href="/login?role=patient"><strong>Sign in here</strong></a></p>
+    </div>
+  </main>
+</div>
+<script src="/js/main.js"></script>
+</body>
+</html>

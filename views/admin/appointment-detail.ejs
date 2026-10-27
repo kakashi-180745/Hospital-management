@@ -1,0 +1,125 @@
+<%- include('../partials/header', { title, active }) %>
+
+<div class="page-head">
+  <div>
+    <h1>Appointment #<%= appt.id %></h1>
+    <p><%= formatDate(appt.appointment_date) %> at <%= timeLabel(appt.time_slot) %> · <span class="badge <%= statusBadge(appt.status) %>"><%= appt.status %></span></p>
+  </div>
+  <div class="page-actions">
+    <a class="btn btn-outline" href="/admin/appointments">All appointments</a>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-header"><h2>Visit details</h2></div>
+    <div class="card-body">
+      <div class="detail-grid">
+        <div class="detail-item"><div class="dt">Patient</div><div class="dd"><%= appt.patient_name %></div></div>
+        <div class="detail-item"><div class="dt">Patient contact</div><div class="dd"><%= appt.patient_phone || '—' %> · <%= appt.patient_email %></div></div>
+        <div class="detail-item"><div class="dt">Doctor</div><div class="dd"><%= appt.doctor_name %></div></div>
+        <div class="detail-item"><div class="dt">Department</div><div class="dd"><%= appt.department_name || '—' %></div></div>
+        <div class="detail-item"><div class="dt">Date</div><div class="dd"><%= formatDate(appt.appointment_date) %></div></div>
+        <div class="detail-item"><div class="dt">Time slot</div><div class="dd"><%= timeLabel(appt.time_slot) %></div></div>
+        <div class="detail-item"><div class="dt">Consultation fee</div><div class="dd"><%= inr(appt.fee) %></div></div>
+        <div class="detail-item"><div class="dt">Booked on</div><div class="dd"><%= formatDateTime(appt.created_at) %></div></div>
+        <div class="detail-item" style="grid-column:1/-1">
+          <div class="dt">Reason / symptoms</div>
+          <div class="dd"><%= appt.reason || 'Not provided' %></div>
+        </div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--line);margin:22px 0">
+
+      <h3 style="font-size:14px;margin-bottom:12px">Update status</h3>
+      <% if (transitions.length === 0) { %>
+        <p class="text-muted fs-sm">This appointment is <strong class="text-capitalize"><%= appt.status %></strong> — no further status changes are allowed.</p>
+      <% } else { %>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <% transitions.forEach(function(st){ %>
+            <form action="/admin/appointments/<%= appt.id %>/status" method="POST" class="inline-form">
+              <input type="hidden" name="status" value="<%= st %>">
+              <button class="btn btn-sm <%= st==='cancelled' ? 'btn-danger' : (st==='completed' ? 'btn-success' : 'btn-primary') %>"
+                      type="submit"
+                      data-confirm="Mark appointment #<%= appt.id %> as <%= st %>?">
+                Mark as <%= st %>
+              </button>
+            </form>
+          <% }) %>
+        </div>
+      <% } %>
+
+      <div class="mt-3">
+        <form action="/admin/appointments/<%= appt.id %>?_method=DELETE" method="POST" class="inline-form"
+              data-confirm="Permanently delete appointment #<%= appt.id %>?">
+          <button class="btn btn-ghost btn-sm text-danger" type="submit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Delete appointment
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>Prescription</h2>
+      <% if (prescription) { %><span class="badge badge-success">Issued</span><% } %>
+    </div>
+    <div class="card-body">
+      <% if (prescription) { %>
+        <div class="stack">
+          <div>
+            <div class="dt" style="font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);font-weight:700">Diagnosis</div>
+            <p class="fw-bold mt-2"><%= prescription.diagnosis %></p>
+          </div>
+          <div>
+            <div class="dt" style="font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);font-weight:700">Medicines</div>
+            <div class="rx-meds mt-2"><%= prescription.medicines %></div>
+          </div>
+          <% if (prescription.notes) { %>
+            <div>
+              <div class="dt" style="font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);font-weight:700">Advice / notes</div>
+              <p class="preserve-lines mt-2 text-muted"><%= prescription.notes %></p>
+            </div>
+          <% } %>
+          <p class="fs-sm text-muted">Issued by <%= prescription.doctor_name || 'the doctor' %> on <%= formatDateTime(prescription.created_at) %></p>
+          <form action="/admin/prescriptions/<%= prescription.id %>?_method=DELETE" method="POST" class="inline-form"
+                data-confirm="Delete this prescription?">
+            <button class="btn btn-danger btn-sm" type="submit">Delete prescription</button>
+          </form>
+        </div>
+      <% } else if (appt.status === 'completed') { %>
+        <form action="/admin/appointments/<%= appt.id %>/prescription" method="POST" class="stack">
+          <div class="form-group">
+            <label>Diagnosis <span class="req">*</span></label>
+            <input class="form-control" name="diagnosis" required placeholder="e.g. Viral fever with throat infection">
+          </div>
+          <div class="form-group">
+            <label>Medicines &amp; dosage <span class="req">*</span></label>
+            <textarea class="form-control" name="medicines" required style="min-height:120px"
+                      placeholder="One medicine per line, e.g.&#10;Paracetamol 500mg - twice daily after meals&#10;Cetirizine 10mg - once at night"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Advice / notes</label>
+            <textarea class="form-control" name="notes" placeholder="Rest, fluids, follow-up date..."></textarea>
+          </div>
+          <button class="btn btn-primary" type="submit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 20.5 3.5 13.5a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+            Issue prescription
+          </button>
+        </form>
+      <% } else { %>
+        <div class="empty-state" style="padding:30px 10px">
+          <div class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h3>Prescription locked</h3>
+          <p>Mark the appointment as <strong>completed</strong> first, then you can issue a prescription.</p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

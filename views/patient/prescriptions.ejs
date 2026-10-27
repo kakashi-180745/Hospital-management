@@ -1,0 +1,55 @@
+<%- include('../partials/header', { title, active }) %>
+
+<div class="page-head">
+  <div>
+    <h1>My prescriptions</h1>
+    <p>Digital prescriptions issued by your doctors — available anytime.</p>
+  </div>
+</div>
+
+<% if (prescriptions.length === 0) { %>
+  <div class="card">
+    <div class="empty-state">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 20.5 3.5 13.5a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+      </div>
+      <h3>No prescriptions yet</h3>
+      <p>After a completed visit, your doctor's diagnosis and medicines will be listed here.</p>
+      <a class="btn btn-primary" href="/patient/appointments/book">Book a consultation</a>
+    </div>
+  </div>
+<% } else { %>
+  <div class="stack">
+    <% prescriptions.forEach(function(rx){ %>
+      <div class="card rx-card">
+        <div class="card-header">
+          <div>
+            <h2><%= rx.diagnosis %></h2>
+            <p>Appointment #<%= rx.appointment_id %> · <%= formatDate(rx.appointment_date) %> at <%= timeLabel(rx.time_slot) %></p>
+          </div>
+          <span class="badge badge-info"><%= rx.doctor_name || 'Doctor' %></span>
+        </div>
+        <div class="card-body">
+          <div class="detail-grid">
+            <div class="detail-item" style="grid-column:1/-1">
+              <div class="dt">Medicines &amp; dosage</div>
+              <div class="rx-meds mt-2"><%= rx.medicines %></div>
+            </div>
+            <% if (rx.notes) { %>
+              <div class="detail-item" style="grid-column:1/-1">
+                <div class="dt">Doctor's advice</div>
+                <p class="preserve-lines mt-2 text-muted"><%= rx.notes %></p>
+              </div>
+            <% } %>
+            <div class="detail-item">
+              <div class="dt">Issued on</div>
+              <div class="dd"><%= formatDateTime(rx.created_at) %></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

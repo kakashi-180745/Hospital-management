@@ -1,0 +1,137 @@
+<%- include('../partials/header', { title, active }) %>
+
+<div class="page-head">
+  <div>
+    <h1>Billing</h1>
+    <p>Raise invoices, record payments and track outstanding dues.</p>
+  </div>
+  <div class="page-actions">
+    <button class="btn btn-primary" data-modal-open="newBillModal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Create bill
+    </button>
+  </div>
+</div>
+
+<div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
+  <div class="stat-card">
+    <div class="stat-icon green">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    </div>
+    <div><div class="stat-value"><%= inr(totals.paid) %></div><div class="stat-label">Collected (paid)</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon red">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </div>
+    <div><div class="stat-value"><%= inr(totals.unpaid) %></div><div class="stat-label">Outstanding (unpaid)</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon teal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/></svg>
+    </div>
+    <div><div class="stat-value"><%= bills.length %></div><div class="stat-label">Invoices shown</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2>Invoices</h2>
+    <div class="tabs">
+      <a class="<%= !filterStatus?'active':'' %>" href="/admin/bills">All</a>
+      <a class="<%= filterStatus==='unpaid'?'active':'' %>" href="/admin/bills?status=unpaid">Unpaid</a>
+      <a class="<%= filterStatus==='paid'?'active':'' %>" href="/admin/bills?status=paid">Paid</a>
+    </div>
+  </div>
+  <div class="card-body flush">
+    <% if (bills.length === 0) { %>
+      <div class="empty-state">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/></svg>
+        </div>
+        <h3>No invoices found</h3>
+        <p>Create a bill to start tracking payments.</p>
+      </div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="table">
+          <thead><tr><th>Bill #</th><th>Patient</th><th>Description</th><th>Amount</th><th>Status</th><th>Date</th><th class="nowrap">Actions</th></tr></thead>
+          <tbody>
+            <% bills.forEach(function(b){ %>
+              <tr>
+                <td class="muted">#<%= b.id %></td>
+                <td>
+                  <div class="cell-name">
+                    <span class="strong"><%= b.patient_name %></span>
+                    <small><%= b.patient_email %></small>
+                  </div>
+                </td>
+                <td class="muted"><%= b.description %></td>
+                <td class="fw-bold nowrap"><%= inr(b.amount) %></td>
+                <td><span class="badge <%= statusBadge(b.status) %>"><%= b.status %></span></td>
+                <td class="nowrap muted">
+                  <%= formatDate(b.created_at.slice(0,10)) %>
+                  <% if (b.paid_at) { %><br><small>Paid <%= formatDate(b.paid_at.slice(0,10)) %></small><% } %>
+                </td>
+                <td>
+                  <div class="row-actions">
+                    <form action="/admin/bills/<%= b.id %>/toggle" method="POST" class="inline-form">
+                      <button class="btn btn-sm <%= b.status==='unpaid' ? 'btn-success' : 'btn-outline' %>" type="submit">
+                        <%= b.status==='unpaid' ? 'Mark paid' : 'Re-open' %>
+                      </button>
+                    </form>
+                    <form action="/admin/bills/<%= b.id %>?_method=DELETE" method="POST" class="inline-form"
+                          data-confirm="Delete bill #<%= b.id %>?">
+                      <button class="btn btn-danger btn-sm" type="submit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<div class="modal" id="newBillModal">
+  <div class="modal-backdrop" data-modal-close></div>
+  <div class="modal-card">
+    <form action="/admin/bills" method="POST">
+      <div class="modal-head">
+        <h3>Create new bill</h3>
+        <button type="button" class="modal-close" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="stack">
+          <div class="form-group">
+            <label>Patient <span class="req">*</span></label>
+            <select class="form-control" name="patient_id" required>
+              <option value="">Select patient...</option>
+              <% patients.forEach(function(p){ %>
+                <option value="<%= p.id %>"><%= p.name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Description <span class="req">*</span></label>
+            <input class="form-control" name="description" required placeholder="e.g. Lab tests + consultation">
+          </div>
+          <div class="form-group">
+            <label>Amount (₹) <span class="req">*</span></label>
+            <input class="form-control" type="number" min="1" step="0.01" name="amount" required placeholder="0.00">
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary">Create bill</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,72 @@
+<%- include('../partials/header', { title, active }) %>
+
+<div class="page-head">
+  <div>
+    <h1>My bills</h1>
+    <p>View invoices and settle outstanding payments online.</p>
+  </div>
+</div>
+
+<div class="summary-strip">
+  <div class="summary-box">
+    <div class="l">Total billed</div>
+    <div class="v"><%= inr(totals.paid + totals.unpaid) %></div>
+  </div>
+  <div class="summary-box">
+    <div class="l">Already paid</div>
+    <div class="v text-success"><%= inr(totals.paid) %></div>
+  </div>
+  <div class="summary-box">
+    <div class="l">Outstanding dues</div>
+    <div class="v text-danger"><%= inr(totals.unpaid) %></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body flush">
+    <% if (bills.length === 0) { %>
+      <div class="empty-state">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/></svg>
+        </div>
+        <h3>No bills yet</h3>
+        <p>Invoices for consultations and services will appear here.</p>
+      </div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="table">
+          <thead><tr><th>Bill #</th><th>Description</th><th>Amount</th><th>Status</th><th>Issued</th><th class="nowrap">Action</th></tr></thead>
+          <tbody>
+            <% bills.forEach(function(b){ %>
+              <tr>
+                <td class="muted">#<%= b.id %></td>
+                <td class="strong"><%= b.description %></td>
+                <td class="fw-bold nowrap"><%= inr(b.amount) %></td>
+                <td><span class="badge <%= statusBadge(b.status) %>"><%= b.status %></span></td>
+                <td class="nowrap muted">
+                  <%= formatDate(b.created_at.slice(0,10)) %>
+                  <% if (b.paid_at) { %><br><small class="text-success">Paid <%= formatDate(b.paid_at.slice(0,10)) %></small><% } %>
+                </td>
+                <td>
+                  <% if (b.status === 'unpaid') { %>
+                    <form action="/patient/bills/<%= b.id %>/pay" method="POST" class="inline-form"
+                          data-confirm="Pay <%= inr(b.amount) %> for bill #<%= b.id %>?">
+                      <button class="btn btn-success btn-sm" type="submit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                        Pay now
+                      </button>
+                    </form>
+                  <% } else { %>
+                    <span class="fs-sm text-success fw-bold">Settled</span>
+                  <% } %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

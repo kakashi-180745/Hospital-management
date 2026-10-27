@@ -1,0 +1,139 @@
+<%- include('../partials/header', { title, active }) %>
+
+<div class="page-head">
+  <div>
+    <h1>Patient profile</h1>
+    <p>Complete clinical and billing history for this patient.</p>
+  </div>
+  <div class="page-actions">
+    <a class="btn btn-outline" href="/admin/patients">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      All patients
+    </a>
+    <a class="btn btn-primary" href="/admin/appointments/new?patient_id=<%= patient.id %>">Book appointment</a>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-header"><h2>Personal details</h2></div>
+    <div class="card-body">
+      <div style="display:flex;align-items:center;gap:15px;margin-bottom:20px">
+        <div class="avatar" style="width:58px;height:58px;font-size:20px"><%= patient.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase() %></div>
+        <div>
+          <div style="font-size:18px;font-weight:800"><%= patient.name %></div>
+          <div class="text-muted fs-sm">Patient ID #<%= patient.id %> · joined <%= formatDate(patient.created_at.slice(0,10)) %></div>
+        </div>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="dt">Email</div><div class="dd"><%= patient.email %></div></div>
+        <div class="detail-item"><div class="dt">Phone</div><div class="dd"><%= patient.phone || '—' %></div></div>
+        <div class="detail-item"><div class="dt">Gender</div><div class="dd"><%= patient.gender || '—' %></div></div>
+        <div class="detail-item"><div class="dt">Date of birth</div><div class="dd"><%= patient.dob ? formatDate(patient.dob) : '—' %></div></div>
+        <div class="detail-item"><div class="dt">Blood group</div><div class="dd"><%= patient.blood_group || '—' %></div></div>
+        <div class="detail-item"><div class="dt">Outstanding dues</div>
+          <div class="dd <%= due > 0 ? 'text-danger' : 'text-success' %>"><%= inr(due) %></div>
+        </div>
+        <div class="detail-item" style="grid-column:1/-1"><div class="dt">Address</div><div class="dd"><%= patient.address || '—' %></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h2>Visit summary</h2></div>
+    <div class="card-body">
+      <%
+        const completed = appointments.filter(a => a.status === 'completed').length;
+        const upcoming = appointments.filter(a => ['pending','confirmed'].includes(a.status)).length;
+        const cancelled = appointments.filter(a => a.status === 'cancelled').length;
+      %>
+      <div class="summary-strip" style="grid-template-columns:repeat(2,1fr)">
+        <div class="summary-box"><div class="l">Total visits</div><div class="v"><%= appointments.length %></div></div>
+        <div class="summary-box"><div class="l">Completed</div><div class="v text-success"><%= completed %></div></div>
+        <div class="summary-box"><div class="l">Upcoming</div><div class="v" style="color:var(--info)"><%= upcoming %></div></div>
+        <div class="summary-box"><div class="l">Cancelled</div><div class="v text-danger"><%= cancelled %></div></div>
+      </div>
+      <p class="text-muted fs-sm">Prescriptions on record: <strong class="text-dark"><%= prescriptions.length %></strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-header"><h2>Appointment history</h2></div>
+  <div class="card-body flush">
+    <% if (appointments.length === 0) { %>
+      <div class="empty-state"><h3>No appointments yet</h3><p>This patient has not booked any visits.</p></div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="table">
+          <thead><tr><th>#</th><th>Date</th><th>Slot</th><th>Doctor</th><th>Department</th><th>Reason</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <% appointments.forEach(function(a){ %>
+              <tr>
+                <td class="muted">#<%= a.id %></td>
+                <td class="nowrap"><%= formatDate(a.appointment_date) %></td>
+                <td class="nowrap"><%= timeLabel(a.time_slot) %></td>
+                <td class="strong"><%= a.doctor_name %></td>
+                <td class="muted"><%= a.department_name || '—' %></td>
+                <td class="muted"><%= a.reason || '—' %></td>
+                <td><span class="badge <%= statusBadge(a.status) %>"><%= a.status %></span></td>
+                <td><a class="btn btn-outline btn-sm" href="/admin/appointments/<%= a.id %>">Open</a></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<div class="grid-2 mt-3">
+  <div class="card">
+    <div class="card-header"><h2>Prescriptions (<%= prescriptions.length %>)</h2></div>
+    <div class="card-body">
+      <% if (prescriptions.length === 0) { %>
+        <p class="text-muted fs-sm">No prescriptions issued yet.</p>
+      <% } else { %>
+        <div class="stack">
+          <% prescriptions.forEach(function(rx){ %>
+            <div class="rx-card" style="border:1px solid var(--line);border-left:4px solid var(--primary);border-radius:11px;padding:15px 17px">
+              <div class="flex-between">
+                <strong><%= rx.diagnosis %></strong>
+                <span class="fs-sm text-muted"><%= formatDate(rx.created_at.slice(0,10)) %> · <%= rx.doctor_name || '—' %></span>
+              </div>
+              <div class="rx-meds mt-2"><%= rx.medicines %></div>
+              <% if (rx.notes) { %><p class="fs-sm text-muted mt-2"><%= rx.notes %></p><% } %>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h2>Bills (<%= bills.length %>)</h2></div>
+    <div class="card-body flush">
+      <% if (bills.length === 0) { %>
+        <div class="empty-state"><h3>No bills</h3><p>No charges have been raised for this patient.</p></div>
+      <% } else { %>
+        <div class="table-responsive">
+          <table class="table">
+            <thead><tr><th>#</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody>
+              <% bills.forEach(function(b){ %>
+                <tr>
+                  <td class="muted">#<%= b.id %></td>
+                  <td><%= b.description %></td>
+                  <td class="fw-bold nowrap"><%= inr(b.amount) %></td>
+                  <td><span class="badge <%= statusBadge(b.status) %>"><%= b.status %></span></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

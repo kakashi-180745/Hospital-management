@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230d9488'%3E%3Cpath d='M19 8h-2V3H7v5H5c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-9c0-1.1-.9-2-2-2zm-6 9h-2v-3H8v-2h3V9h2v3h3v2h-3v3z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="lp-nav">
+  <div style="display:flex;align-items:center;gap:11px">
+    <div class="brand-logo">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M19 8h-2V3H7v5H5c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-9c0-1.1-.9-2-2-2zm-6 9h-2v-3H8v-2h3V9h2v3h3v2h-3v3z"/></svg>
+    </div>
+    <div>
+      <div style="font-weight:800;font-size:16.5px">MediCare HMS</div>
+    </div>
+  </div>
+  <div class="nav-links">
+    <a class="btn btn-outline" href="/login?role=patient">Patient login</a>
+    <a class="btn btn-primary" href="/login?role=admin">Admin login</a>
+  </div>
+</nav>
+
+<%- include('partials/flash') %>
+
+<section class="hero">
+  <div>
+    <span class="eyebrow">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      Complete hospital management
+    </span>
+    <h1>Run your hospital <span class="hl">end to end</span> — from registration to recovery.</h1>
+    <p class="lead">MediCare HMS unifies department and doctor management, appointment scheduling, digital prescriptions and patient billing into one secure, easy-to-use platform.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="/register" style="padding:13px 24px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        Register as patient
+      </a>
+      <a class="btn btn-outline" href="/login" style="padding:13px 24px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Sign in
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-art">
+    <div class="art-stat">
+      <div class="n">6+</div>
+      <div class="l">Specialist departments</div>
+    </div>
+    <div class="art-stat">
+      <div class="n">24/7</div>
+      <div class="l">Online appointment booking</div>
+    </div>
+    <div class="art-stat">
+      <div class="n">100%</div>
+      <div class="l">Digital prescriptions &amp; billing</div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>Everything a modern hospital needs</h2>
+    <p>Role-based portals give administrators full control while patients get a smooth self-service experience.</p>
+  </div>
+  <div class="features">
+    <div class="feature-card">
+      <div class="f-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg>
+      </div>
+      <h3>Departments &amp; doctors</h3>
+      <p>Admin controls departments, doctor profiles, specializations, consultation fees and weekly availability.</p>
+    </div>
+    <div class="feature-card">
+      <div class="f-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      </div>
+      <h3>Smart appointments</h3>
+      <p>Real-time slot availability prevents double-booking, with pending, confirmed, completed and cancelled workflows.</p>
+    </div>
+    <div class="feature-card">
+      <div class="f-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 20.5 3.5 13.5a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+      </div>
+      <h3>Digital prescriptions</h3>
+      <p>Doctors' diagnoses, medicines and advice are recorded against visits and always available to the patient.</p>
+    </div>
+    <div class="feature-card">
+      <div class="f-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
+      </div>
+      <h3>Billing &amp; payments</h3>
+      <p>Generate invoices, track dues and let patients settle bills online with full payment history.</p>
+    </div>
+    <div class="feature-card">
+      <div class="f-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <h3>Patient records</h3>
+      <p>Every patient's visits, prescriptions and bills are consolidated in a single 360-degree profile.</p>
+    </div>
+    <div class="feature-card">
+      <div class="f-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <h3>Secure access</h3>
+      <p>Hashed passwords and protected sessions keep the admin and patient portals strictly separated.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>Choose your portal</h2>
+    <p>Two dedicated experiences, one connected system.</p>
+  </div>
+  <div class="portal-cards">
+    <div class="portal-card admin">
+      <div class="p-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h3>Administrator portal</h3>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Dashboard with hospital-wide stats and today's schedule</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Full CRUD over departments, doctors and patients</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Confirm, complete or cancel appointments; issue prescriptions</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Create bills, record payments and track revenue</li>
+      </ul>
+      <a class="btn btn-primary btn-block" href="/login?role=admin">Enter admin portal</a>
+    </div>
+
+    <div class="portal-card patient">
+      <div class="p-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <h3>Patient portal</h3>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Self-register and book appointments with any specialist</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Track appointment status and cancel when needed</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Access prescriptions and medical advice anytime</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>View dues and pay bills online</li>
+      </ul>
+      <a class="btn btn-primary btn-block" href="/login?role=patient">Enter patient portal</a>
+    </div>
+  </div>
+</section>
+
+<footer class="lp-footer">
+  <strong>MediCare Hospital Management System</strong> · Demo build — admin: <strong>admin@hospital.com / admin123</strong> · patient: <strong>patient@demo.com / patient123</strong>
+</footer>
+
+<script src="/js/main.js"></script>
+</body>
+</html>

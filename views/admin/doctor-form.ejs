@@ -1,0 +1,65 @@
+<%
+  const selectedDays = doc ? (doc.available_days || '').split(',') : weekDays.slice(0, 5);
+%>
+<div class="form-grid">
+  <div class="form-group">
+    <label>Full name <span class="req">*</span></label>
+    <input class="form-control" name="name" required value="<%= doc ? doc.name : '' %>" placeholder="Dr. ...">
+  </div>
+  <div class="form-group">
+    <label>Email <span class="req">*</span></label>
+    <input class="form-control" type="email" name="email" required value="<%= doc ? (doc.email||'') : '' %>" placeholder="doctor@hospital.com">
+  </div>
+  <div class="form-group">
+    <label>Phone</label>
+    <input class="form-control" name="phone" maxlength="10" value="<%= doc ? (doc.phone||'') : '' %>" placeholder="10-digit mobile">
+  </div>
+  <div class="form-group">
+    <label>Department</label>
+    <select class="form-control" name="department_id">
+      <option value="">— Unassigned —</option>
+      <% departments.forEach(function(d){ %>
+        <option value="<%= d.id %>" <%= doc && doc.department_id === d.id ? 'selected' : '' %>><%= d.name %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="form-group span-2">
+    <label>Specialization</label>
+    <input class="form-control" name="specialization" value="<%= doc ? (doc.specialization||'') : '' %>" placeholder="e.g. Interventional Cardiologist">
+  </div>
+  <div class="form-group">
+    <label>Experience (years)</label>
+    <input class="form-control" type="number" min="0" max="60" name="experience_years" value="<%= doc ? doc.experience_years : 0 %>">
+  </div>
+  <div class="form-group">
+    <label>Consultation fee (₹)</label>
+    <input class="form-control" type="number" min="0" name="fee" value="<%= doc ? doc.fee : 0 %>">
+  </div>
+  <div class="form-group">
+    <label>Available from</label>
+    <input class="form-control" type="time" name="available_from" value="<%= doc ? doc.available_from : '09:00' %>">
+  </div>
+  <div class="form-group">
+    <label>Available until</label>
+    <input class="form-control" type="time" name="available_to" value="<%= doc ? doc.available_to : '17:00' %>">
+  </div>
+  <div class="form-group span-2">
+    <label>Working days</label>
+    <div class="checkbox-row">
+      <% weekDays.forEach(function(day){ %>
+        <label class="checkbox-pill">
+          <input type="checkbox" name="available_days" value="<%= day %>" <%= selectedDays.includes(day) ? 'checked' : '' %>>
+          <%= day %>
+        </label>
+      <% }) %>
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Status</label>
+    <select class="form-control" name="status">
+      <% doctorStatuses.forEach(function(s){ %>
+        <option value="<%= s %>" <%= doc && doc.status === s ? 'selected' : '' %>><%= s.charAt(0).toUpperCase() + s.slice(1) %></option>
+      <% }) %>
+    </select>
+  </div>
+</div>

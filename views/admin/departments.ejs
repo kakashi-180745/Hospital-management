@@ -1,0 +1,131 @@
+<%- include('../partials/header', { title, active }) %>
+
+<div class="page-head">
+  <div>
+    <h1>Departments</h1>
+    <p>Organize clinical specialties and the doctors assigned to them.</p>
+  </div>
+  <div class="page-actions">
+    <button class="btn btn-primary" data-modal-open="addDeptModal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add department
+    </button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body flush">
+    <% if (departments.length === 0) { %>
+      <div class="empty-state">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg>
+        </div>
+        <h3>No departments yet</h3>
+        <p>Create your first department to start adding doctors.</p>
+      </div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr><th>Department</th><th>Description</th><th>Doctors</th><th>Appointments</th><th class="nowrap">Actions</th></tr>
+          </thead>
+          <tbody>
+            <% departments.forEach(function(d){ %>
+              <tr>
+                <td class="strong"><%= d.name %></td>
+                <td class="muted"><%= d.description || '—' %></td>
+                <td><span class="badge badge-info"><%= d.doctor_count %> doctor(s)</span></td>
+                <td class="muted"><%= d.appointment_count %></td>
+                <td>
+                  <div class="row-actions">
+                    <button class="btn btn-outline btn-sm" data-modal-open="editDeptModal"
+                            data-id="<%= d.id %>" data-name="<%= d.name %>"
+                            data-description="<%= d.description || '' %>">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
+                      Edit
+                    </button>
+                    <form action="/admin/departments/<%= d.id %>?_method=DELETE" method="POST" class="inline-form"
+                          data-confirm="Delete department '<%= d.name %>'? Doctors will become unassigned.">
+                      <button class="btn btn-danger btn-sm" type="submit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        Delete
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<!-- Add modal -->
+<div class="modal" id="addDeptModal">
+  <div class="modal-backdrop" data-modal-close></div>
+  <div class="modal-card">
+    <form action="/admin/departments" method="POST">
+      <div class="modal-head">
+        <h3>Add new department</h3>
+        <button type="button" class="modal-close" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Department name <span class="req">*</span></label>
+          <input class="form-control" name="name" required placeholder="e.g. Radiology">
+        </div>
+        <div class="form-group mt-2">
+          <label>Description</label>
+          <textarea class="form-control" name="description" placeholder="What does this department handle?"></textarea>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary">Create department</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit modal -->
+<div class="modal" id="editDeptModal">
+  <div class="modal-backdrop" data-modal-close></div>
+  <div class="modal-card">
+    <form id="editDeptForm" method="POST">
+      <input type="hidden" name="_method" value="PUT">
+      <div class="modal-head">
+        <h3>Edit department</h3>
+        <button type="button" class="modal-close" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Department name <span class="req">*</span></label>
+          <input class="form-control" name="name" id="editDeptName" required>
+        </div>
+        <div class="form-group mt-2">
+          <label>Description</label>
+          <textarea class="form-control" name="description" id="editDeptDesc"></textarea>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('[data-modal-open="editDeptModal"]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.getElementById('editDeptForm').action =
+        '/admin/departments/' + btn.dataset.id + '?_method=PUT';
+      document.getElementById('editDeptName').value = btn.dataset.name;
+      document.getElementById('editDeptDesc').value = btn.dataset.description;
+    });
+  });
+</script>
+
+<%- include('../partials/footer') %>

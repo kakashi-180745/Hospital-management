@@ -1,0 +1,65 @@
+<%- include('../partials/header', { title, active }) %>
+
+<div class="page-head">
+  <div>
+    <h1>My appointments</h1>
+    <p>Every visit you have booked with MediCare Hospital.</p>
+  </div>
+  <div class="page-actions">
+    <a class="btn btn-primary" href="/patient/appointments/book">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Book new appointment
+    </a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body flush">
+    <% if (appointments.length === 0) { %>
+      <div class="empty-state">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        </div>
+        <h3>No appointments yet</h3>
+        <p>Choose a doctor and a convenient slot to get started.</p>
+        <a class="btn btn-primary" href="/patient/appointments/book">Book your first visit</a>
+      </div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr><th>#</th><th>Date &amp; time</th><th>Doctor</th><th>Department</th><th>Reason</th><th>Fee</th><th>Status</th><th class="nowrap">Actions</th></tr>
+          </thead>
+          <tbody>
+            <% appointments.forEach(function(a){ %>
+              <tr>
+                <td class="muted">#<%= a.id %></td>
+                <td class="nowrap">
+                  <strong><%= formatDate(a.appointment_date) %></strong><br>
+                  <small class="text-muted"><%= timeLabel(a.time_slot) %></small>
+                </td>
+                <td class="strong"><%= a.doctor_name %></td>
+                <td class="muted"><%= a.department_name || '—' %></td>
+                <td class="muted" style="max-width:220px"><%= a.reason || '—' %></td>
+                <td class="nowrap fw-bold"><%= inr(a.fee) %></td>
+                <td><span class="badge <%= statusBadge(a.status) %>"><%= a.status %></span></td>
+                <td>
+                  <% if (['pending','confirmed'].includes(a.status)) { %>
+                    <form action="/patient/appointments/<%= a.id %>/cancel" method="POST" class="inline-form"
+                          data-confirm="Cancel appointment #<%= a.id %> with <%= a.doctor_name %>?">
+                      <button class="btn btn-danger btn-sm" type="submit">Cancel</button>
+                    </form>
+                  <% } else { %>
+                    <span class="fs-sm text-muted">—</span>
+                  <% } %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
